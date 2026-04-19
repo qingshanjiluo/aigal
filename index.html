@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>爱旮旯给目 · AI互动叙事游戏</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-window">
+        <!-- 登录面板 -->
+        <div id="login-panel" class="panel center-panel">
+            <div class="glass-card">
+                <div class="logo">✨ 爱旮旯给目</div>
+                <div class="subtitle">AI驱动的互动叙事游戏</div>
+                <input type="text" id="login-username" placeholder="用户名" autocomplete="off">
+                <input type="password" id="login-password" placeholder="密码">
+                <button id="login-btn" class="primary-btn">登录</button>
+                <button id="show-register-btn" class="secondary-btn">注册新账号</button>
+            </div>
+        </div>
+
+        <!-- 游戏主面板 -->
+        <div id="game-panel" class="panel" style="display: none;">
+            <!-- 顶部状态栏 -->
+            <div class="titlebar">
+                <div class="titlebar-left">
+                    <div class="traffic-lights">
+                        <span class="close"></span>
+                        <span class="minimize"></span>
+                        <span class="zoom"></span>
+                    </div>
+                    <div class="chapter-info">
+                        <span id="chapter-badge">📖 第一章：初遇</span>
+                    </div>
+                </div>
+                <div class="titlebar-center">
+                    <div class="scene-indicator-header">🌄 <span id="scene-text-header">现代校园</span></div>
+                </div>
+                <div class="titlebar-right">
+                    <button id="settings-btn" class="icon-btn" title="全局设置">⚙️</button>
+                </div>
+            </div>
+
+            <div class="game-container">
+                <!-- 左侧：角色立绘区 -->
+                <div class="portrait-area glass-panel">
+                    <!-- 章节 & 场景信息 -->
+                    <div class="game-meta-bar">
+                        <div class="meta-item meta-chapter">
+                            <span class="meta-icon">📖</span>
+                            <span id="chapter-display">第一章：初遇</span>
+                        </div>
+                        <div class="meta-item meta-scene">
+                            <span class="meta-icon">🌄</span>
+                            <span id="scene-display">现代校园</span>
+                        </div>
+                    </div>
+
+                    <!-- 立绘区域 -->
+                    <div class="portrait-frame" id="portrait-frame">
+                        <div class="portrait-image-container" id="portrait-image-container">
+                            <img id="portrait-image" src="" alt="角色立绘" style="display:none;">
+                            <div class="portrait-emoji" id="portrait-emoji">😊</div>
+                        </div>
+                        <div class="emotion-indicator" id="emotion-indicator">😊 正常</div>
+                    </div>
+                    <div class="portrait-controls">
+                        <button id="upload-portrait-btn" class="tiny-glass-btn">📤 上传立绘</button>
+                        <button id="manage-portraits-btn" class="tiny-glass-btn">🎨 表情管理</button>
+                    </div>
+
+                    <!-- 角色名 & 好感度 -->
+                    <div class="portrait-name" id="portrait-name">小爱</div>
+                    <div class="character-status">
+                        <div class="status-item">
+                            <span class="status-label">好感度</span>
+                            <div class="status-bar">
+                                <div class="status-fill" id="affection-bar" style="width:50%"></div>
+                            </div>
+                            <span class="status-value" id="affection-value">50/100</span>
+                        </div>
+                    </div>
+
+                    <!-- 快捷功能按钮 -->
+                    <div class="quick-actions">
+                        <button id="story-review-btn" class="quick-btn">📖 回溯</button>
+                        <button id="save-game-btn" class="quick-btn">💾 存档</button>
+                        <button id="load-game-btn" class="quick-btn">📂 读档</button>
+                        <button id="world-switch-btn" class="quick-btn">🌍 世界</button>
+                    </div>
+
+                    <!-- 设置开关 -->
+                    <div class="settings-mini">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="auto-play-toggle">
+                            <span class="slider"></span>
+                            <span>自动播放</span>
+                        </label>
+                        <label class="toggle-switch" style="margin-top: 10px;">
+                            <input type="checkbox" id="auto-voice-toggle" checked>
+                            <span class="slider"></span>
+                            <span>自动语音</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 中间：对话区域 -->
+                <div class="chat-area glass-panel">
+                    <div class="scene-indicator">🌄 场景 · <span id="scene-text">加载中...</span></div>
+                    <div class="messages-container" id="messages-container"></div>
+                    
+                    <!-- 选项栏 -->
+                    <div class="options-bar" id="options-bar"></div>
+                    
+                    <!-- 输入区 -->
+                    <div class="input-area">
+                        <div class="input-bar">
+                            <input type="text" id="message-input" placeholder="输入你的行动或对话..." autocomplete="off">
+                            <button id="send-btn" class="send-btn">发送</button>
+                        </div>
+                        <div class="input-hints">
+                            <span class="hint">💡 按Enter发送 · 支持自由输入或点击上方选项</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：角色列表与功能 -->
+                <div class="sidebar glass-panel">
+                    <div class="sidebar-section">
+                        <h3>📖 角色</h3>
+                        <div id="char-list" class="char-list"></div>
+                        <div class="affection-summary" id="affection-summary"></div>
+                        <button id="add-char-btn" class="small-glass-btn">➕ 添加角色</button>
+                    </div>
+                    
+                    <hr class="glass-divider">
+                    
+                    <div class="sidebar-section">
+                        <h3>📚 功能</h3>
+                        <button id="export-config-btn" class="small-glass-btn">💾 导出配置</button>
+                        <button id="import-config-btn" class="small-glass-btn">📂 导入配置</button>
+                        <input type="file" id="import-file-input" accept=".json" style="display:none">
+                        <button id="export-story-btn" class="small-glass-btn">📄 导出故事</button>
+                        <button id="export-html-btn" class="small-glass-btn">🌐 导出HTML</button>
+                        <button id="cg-gallery-btn" class="small-glass-btn">🖼️ CG图鉴</button>
+                        <button id="ending-gallery-btn" class="small-glass-btn">🏆 结局图鉴</button>
+                        <button id="logout-btn" class="small-glass-btn">🚪 登出</button>
+                    </div>
+                    
+                    <!-- 重要事件面板 -->
+                    <div class="sidebar-section events-section" id="events-section" style="display:none;">
+                        <hr class="glass-divider">
+                        <h3>🔮 重要记忆</h3>
+                        <div id="events-list" class="events-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加角色模态框 -->
+    <div id="add-char-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card">
+            <h3>✨ 新角色</h3>
+            <input type="text" id="new-char-name" placeholder="角色名">
+            <textarea id="new-char-prompt" placeholder="性格描述（例如：傲娇学姐）" rows="3"></textarea>
+            <label>初始好感度: <input type="number" id="new-char-aff" value="50" min="0" max="100"></label>
+            <div class="modal-buttons">
+                <button id="confirm-add-char" class="primary-btn">添加</button>
+                <button id="cancel-add-char" class="secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 角色编辑模态框 -->
+    <div id="edit-char-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card">
+            <h3>✏️ 编辑角色</h3>
+            <input type="hidden" id="edit-char-id">
+            <input type="text" id="edit-char-name" placeholder="角色名">
+            <textarea id="edit-char-prompt" placeholder="性格描述" rows="3"></textarea>
+            <label>好感度: <input type="number" id="edit-char-aff" value="50" min="0" max="100"></label>
+            <div class="modal-buttons">
+                <button id="confirm-edit-char" class="primary-btn">保存</button>
+                <button id="delete-char-btn" class="danger-btn">🗑️ 删除角色</button>
+                <button id="cancel-edit-char" class="secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 立绘管理模态框 -->
+    <div id="portrait-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3>🎨 角色立绘管理</h3>
+            <div class="portrait-manager">
+                <div class="portrait-upload-section">
+                    <h4>上传新立绘</h4>
+                    <select id="portrait-type-select">
+                        <option value="normal">正常</option>
+                        <option value="happy">开心</option>
+                        <option value="angry">生气</option>
+                        <option value="sad">难过</option>
+                        <option value="shy">害羞</option>
+                        <option value="surprised">惊讶</option>
+                        <option value="closeup">近景</option>
+                        <option value="side">侧身</option>
+                    </select>
+                    <input type="file" id="portrait-file-input" accept="image/*">
+                    <button id="upload-portrait-confirm" class="primary-btn">上传</button>
+                </div>
+                <div class="portrait-preview-section">
+                    <h4>当前立绘</h4>
+                    <div id="portrait-preview-list" class="portrait-preview-list"></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="close-portrait-modal" class="secondary-btn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局设置模态框 -->
+    <div id="settings-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3>⚙️ 全局设置</h3>
+            <div class="settings-form">
+                <div class="setting-group">
+                    <label class="setting-label">🔑 DeepSeek API 密钥</label>
+                    <div class="api-key-row">
+                        <input type="password" id="setting-api-key" placeholder="留空使用默认密钥" style="flex:1;">
+                        <button id="toggle-key-visible" class="tiny-glass-btn" type="button">👁️ 显示</button>
+                    </div>
+                    <button id="view-current-key-btn" class="tiny-glass-btn" type="button" style="margin-top:6px;display:none;">🔍 查看已保存密钥</button>
+                    <small class="setting-hint">仅保存在你的账号下，管理员无法查看。留空则使用默认密钥。</small>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">📖 故事背景</label>
+                    <input type="text" id="setting-story-bg" placeholder="例如：现代校园">
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">📝 全局附加提示词</label>
+                    <textarea id="setting-global-prompt" placeholder="附加给AI的提示词..." rows="3"></textarea>
+                </div>
+                <div class="setting-group toggle-row">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="setting-auto-scene">
+                        <span class="slider"></span>
+                        <span>自动生成场景</span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="setting-auto-options">
+                        <span class="slider"></span>
+                        <span>自动生成选项</span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="setting-group-mode">
+                        <span class="slider"></span>
+                        <span>群聊模式</span>
+                    </label>
+                </div>
+                <div class="setting-group threshold-row">
+                    <label class="setting-label">幸福结局阈值: <input type="number" id="setting-happy-th" value="95" min="0" max="100"></label>
+                    <label class="setting-label">离别结局阈值: <input type="number" id="setting-sad-th" value="10" min="0" max="100"></label>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">🎉 幸福结局文本（{name} 会被替换为角色名）</label>
+                    <input type="text" id="setting-happy-text" placeholder="✨ 达成【幸福结局】与{name} ✨">
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">💔 离别结局文本</label>
+                    <input type="text" id="setting-sad-text" placeholder="💔 达成【离别结局】">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="save-settings-btn" class="primary-btn">保存设置</button>
+                <button id="close-settings-btn" class="secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 剧情回放模态框 -->
+    <div id="story-review-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3>📖 剧情回溯</h3>
+            <div class="story-review-desc">点击任意对话可回溯到该位置继续游戏</div>
+            <div class="story-review-container" id="story-review-container"></div>
+            <div class="modal-buttons">
+                <button id="close-story-review" class="secondary-btn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 存档/读档模态框 -->
+    <div id="save-load-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3 id="save-load-title">💾 存档</h3>
+            <div class="save-slots" id="save-slots"></div>
+            <div class="modal-buttons">
+                <button id="close-save-load" class="secondary-btn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 世界观切换模态框 -->
+    <div id="world-switch-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3>🌍 切换世界观</h3>
+            <div class="world-list" id="world-list"></div>
+            <div class="modal-buttons">
+                <button id="add-world-btn" class="primary-btn">➕ 新建世界观</button>
+                <button id="close-world-switch" class="secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建/编辑世界观模态框 -->
+    <div id="world-edit-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3 id="world-edit-title">✨ 新建世界观</h3>
+            <input type="hidden" id="world-edit-id">
+            <div class="setting-group">
+                <label class="setting-label">世界名称</label>
+                <input type="text" id="world-edit-name" placeholder="例如：魔法学院">
+            </div>
+            <div class="setting-group">
+                <label class="setting-label">图标</label>
+                <input type="text" id="world-edit-icon" placeholder="例如：🏰" maxlength="2">
+            </div>
+            <div class="setting-group">
+                <label class="setting-label">初始场景</label>
+                <input type="text" id="world-edit-bg" placeholder="例如：魔法学院大门">
+            </div>
+            <div class="setting-group">
+                <label class="setting-label">描述</label>
+                <input type="text" id="world-edit-desc" placeholder="一句话描述这个世界...">
+            </div>
+            <div class="setting-group">
+                <label class="setting-label">AI 预设提示词（影响剧情风格）</label>
+                <textarea id="world-edit-prompt" rows="3" placeholder="例如：这是一个剑与魔法的世界，所有人都会使用魔法..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button id="confirm-world-edit" class="primary-btn">保存</button>
+                <button id="cancel-world-edit" class="secondary-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CG图鉴模态框 -->
+    <div id="cg-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3>🖼️ CG图鉴</h3>
+            <div id="cg-list" class="cg-grid"></div>
+            <button id="close-cg-modal" class="secondary-btn">关闭</button>
+        </div>
+    </div>
+
+    <!-- 结局图鉴模态框 -->
+    <div id="ending-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-card wide">
+            <h3>🏆 结局图鉴</h3>
+            <div id="ending-list" class="ending-grid"></div>
+            <button id="close-ending-modal" class="secondary-btn">关闭</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
